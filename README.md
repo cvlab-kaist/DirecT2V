@@ -2,4 +2,4 @@
 
 ## Video Demo
 
-## The code and an interactive demo will be released soon! Stay in touch.
+**The code and an interactive demo will be released soon! Stay in touch.**
