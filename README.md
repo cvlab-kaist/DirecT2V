@@ -10,6 +10,6 @@ https://github.com/KU-CVLAB/InstrucT2V/assets/5498512/4ff81c43-d6d9-4f4a-8263-4b
 
 ![image](https://github.com/KU-CVLAB/InstrucT2V/assets/96568164/ec206804-4563-4ddd-a9e1-ce1f2b4bd6eb)
 
-**Overall pipeline of the proposed InstrucT2V framework.** Our framework consists of two parts: directing an abstract user prompt with an LLM director (GPT-4) and video generation with a modified T2I diffusion (Stable Diffusion).
+**Overall pipeline of InstrucT2V.** Our framework consists of two parts: directing an abstract user prompt with an LLM director (GPT-4) and video generation with a modified T2I diffusion (Stable Diffusion).
 
 **The code and an interactive demo will be released soon! Stay in touch.**
