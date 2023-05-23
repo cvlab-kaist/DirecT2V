@@ -1,5 +1,5 @@
 # Large Language Models are Frame-level Directors for Zero-shot Text-to-Video Generation
-**Susung Hong, Junyoung Seo, Sunghwan Hong, Heeseong Shin, and Seungryong Kim**
+**Susung Hong\quad Junyoung Seo\quad Sunghwan Hong\quad Heeseong Shin\quad Seungryong Kim**
 
 ## Zero-shot Video Demo
 
