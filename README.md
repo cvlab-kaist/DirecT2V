@@ -13,4 +13,4 @@ https://github.com/KU-CVLAB/DirecT2V/assets/5498512/b721aa65-8156-4fdc-a371-db6e
 
 **Overall pipeline of DirecT2V.** Our framework consists of two parts: directing an abstract user prompt with an LLM director (GPT-4) and video generation with a modified T2I diffusion (Stable Diffusion).
 
-## 🔥 We are working on the code and an interactive demo. Stay in touch!
+## 🔥 We are working on the code. Stay in touch!
