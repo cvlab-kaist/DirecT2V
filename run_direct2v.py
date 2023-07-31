@@ -22,10 +22,12 @@ prompts = [
     "The first corgi begins to catch up, the two corgis running neck and neck.",
 ]
 
-result = pipe_ours(prompt=prompts, generator=torch.Generator('cuda').manual_seed(21)).images
-result = [(r * 255).astype("uint8") for r in result]
-imageio.mimsave("video_ours.mp4", result, fps=6)
-
-result = pipe_t2vz(prompt=prompt, generator=torch.Generator('cuda').manual_seed(21)).images
+# Text2Video-Zero sample
+result = pipe_t2vz(prompt=prompt, generator=torch.Generator('cuda').manual_seed(10)).images
 result = [(r * 255).astype("uint8") for r in result]
 imageio.mimsave("video_t2vz.mp4", result, fps=6)
+
+# DirecT2V sample
+result = pipe_ours(prompt=prompts, generator=torch.Generator('cuda').manual_seed(10)).images
+result = [(r * 255).astype("uint8") for r in result]
+imageio.mimsave("video_ours.mp4", result, fps=6)
