@@ -4,9 +4,7 @@ from direct2v_zeroshot import DirecT2VPipeline
 from diffusers import TextToVideoZeroPipeline
 
 model_id = "runwayml/stable-diffusion-v1-5"
-# Our method
 pipe_ours = DirecT2VPipeline.from_pretrained(model_id, rot_attn=True, all_attn=False, torch_dtype=torch.float16).to("cuda")
-# Text2Video-Zero
 pipe_t2vz = TextToVideoZeroPipeline.from_pretrained(model_id, torch_dtype=torch.float16).to("cuda")
 
 # Fixed prompt (Text2Video-Zero)
