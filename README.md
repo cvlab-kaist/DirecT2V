@@ -13,4 +13,21 @@ https://github.com/KU-CVLAB/DirecT2V/assets/5498512/b721aa65-8156-4fdc-a371-db6e
 
 **Overall pipeline of DirecT2V.** Our framework consists of two parts: directing an abstract user prompt with an LLM director (GPT-4) and video generation with a modified T2I diffusion (Stable Diffusion).
 
-## 🔥 We are working on the code. Stay in touch!
+## 🗃️: Code
+
+The running code can be found in `run_direct2v.py`. We utilized PyTorch 1.13.0 and Diffusers 1.19.3 in our environment. Due to our budget constraints, we opted for pre-calculated prompts instead of using the GPT-4 API.
+
+## 🔥 TODOs
+[x] Upload code
+[ ] Implement a demo using the ChatGPT API
+[ ] Improve efficiency
+
+## Cite As
+```
+@article{hong2023large,
+  title={Large Language Models are Frame-level Directors for Zero-shot Text-to-Video Generation},
+  author={Hong, Susung and Seo, Junyoung and Hong, Sunghwan and Shin, Heeseong and Kim, Seungryong},
+  journal={arXiv preprint arXiv:2305.14330},
+  year={2023}
+}
+```
