@@ -4,7 +4,7 @@ from direct2v_zeroshot import DirecT2VPipeline
 from diffusers import TextToVideoZeroPipeline
 
 model_id = "runwayml/stable-diffusion-v1-5"
-pipe_ours = DirecT2VPipeline.from_pretrained(model_id, rot_attn=True, all_attn=False, torch_dtype=torch.float16).to("cuda")
+pipe_ours = DirecT2VPipeline.from_pretrained(model_id, torch_dtype=torch.float16).to("cuda")
 pipe_t2vz = TextToVideoZeroPipeline.from_pretrained(model_id, torch_dtype=torch.float16).to("cuda")
 
 # Fixed prompt (Text2Video-Zero)
@@ -22,10 +22,10 @@ prompts = [
     "The first corgi begins to catch up, the two corgis running neck and neck.",
 ]
 
-result = pipe_ours(prompt=prompts, generator=torch.Generator('cuda').manual_seed(10)).images
+result = pipe_ours(prompt=prompts, generator=torch.Generator('cuda').manual_seed(21)).images
 result = [(r * 255).astype("uint8") for r in result]
 imageio.mimsave("video_ours.mp4", result, fps=6)
 
-result = pipe_t2vz(prompt=prompt, generator=torch.Generator('cuda').manual_seed(10)).images
+result = pipe_t2vz(prompt=prompt, generator=torch.Generator('cuda').manual_seed(21)).images
 result = [(r * 255).astype("uint8") for r in result]
 imageio.mimsave("video_t2vz.mp4", result, fps=6)

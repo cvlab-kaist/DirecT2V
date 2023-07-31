@@ -46,12 +46,11 @@ class CrossFrameAttnProcessor:
             2, due to classifier-free guidance.
     """
 
-    def __init__(self, pipeline, batch_size=2, rot_attn=False, dual_filter=False, dual_filter_thres=0.0):
+    def __init__(self, pipeline, batch_size=2, rot_attn=False, dual_filter=0.05):
         self.batch_size = batch_size
         self.pipeline = pipeline
         self.rot_attn = rot_attn
         self.dual_filter = dual_filter
-        self.dual_filter_thres = dual_filter_thres
 
     def __call__(self, attn, hidden_states, encoder_hidden_states=None, attention_mask=None):
         batch_size, sequence_length, _ = hidden_states.shape
@@ -66,6 +65,10 @@ class CrossFrameAttnProcessor:
 
         key = attn.to_k(encoder_hidden_states)
         value = attn.to_v(encoder_hidden_states)
+
+        if not is_cross_attention and self.dual_filter > 0.0:
+            key_orig = key.clone()
+            value_orig = value.clone()
 
         # Cross Frame Attention
         if not is_cross_attention:
@@ -95,7 +98,7 @@ class CrossFrameAttnProcessor:
         # Dual Softmax
         # TODO: Optimize the code
         hidden_states_orig = None
-        if not is_cross_attention and self.dual_filter and self.dual_filter > 0.0:
+        if not is_cross_attention and self.dual_filter > 0.0:
             batch_total, hw, _ = attention_probs.shape
             batch = batch_total // attn.heads
             if batch_size != 2:
@@ -105,7 +108,7 @@ class CrossFrameAttnProcessor:
                 del(attention_probs_rev)
                 # conf_mat = conf_mat.view(batch, attn.heads, hw, hw)
                 conf_mat = conf_mat.mean(dim=-1)
-                conf_mask = (conf_mat > conf_mat.float().quantile(self.dual_filter_thres))#conf_mat.std())
+                conf_mask = (conf_mat > conf_mat.float().quantile(self.dual_filter))#conf_mat.std())
                 conf_mask = conf_mask.type(attention_probs.dtype)
                 conf_mask = conf_mask.unsqueeze(-1)
 
@@ -140,14 +143,13 @@ class CrossFrameAttnProcessor2_0:
             2, due to classifier-free guidance.
     """
 
-    def __init__(self, pipeline, batch_size=2, rot_attn=False, dual_filter=False, dual_filter_thres=0.0):
+    def __init__(self, pipeline, batch_size=2, rot_attn=False, dual_filter=0.01):
         if not hasattr(F, "scaled_dot_product_attention"):
             raise ImportError("AttnProcessor2_0 requires PyTorch 2.0, to use it, please upgrade PyTorch to 2.0.")
         self.batch_size = batch_size
         self.pipeline = pipeline
         self.rot_attn = rot_attn
         self.dual_filter = dual_filter
-        self.dual_filter_thres = dual_filter_thres
 
     def __call__(self, attn, hidden_states, encoder_hidden_states=None, attention_mask=None):
         batch_size, sequence_length, _ = (
@@ -198,11 +200,11 @@ class CrossFrameAttnProcessor2_0:
 
         # Dual Softmax
         # TODO: Optimize the code
-        if self.dual_filter:
+        if self.dual_filter > 0.0:
             attention_probs = attn.get_attention_scores(query, key, attention_mask)
 
             hidden_states_orig = None
-            if not is_cross_attention and self.dual_filter and self.dual_filter > 0.0:
+            if not is_cross_attention:
                 batch_total, hw, _ = attention_probs.shape
                 batch = batch_total // attn.heads
                 if batch_size != 2:
@@ -212,7 +214,7 @@ class CrossFrameAttnProcessor2_0:
                     del(attention_probs_rev)
                     # conf_mat = conf_mat.view(batch, attn.heads, hw, hw)
                     conf_mat = conf_mat.mean(dim=-1)
-                    conf_mask = (conf_mat > conf_mat.float().quantile(self.dual_filter_thres))#conf_mat.std())
+                    conf_mask = (conf_mat > conf_mat.float().quantile(self.dual_filter))#conf_mat.std())
                     conf_mask = conf_mask.type(attention_probs.dtype)
                     conf_mask = conf_mask.unsqueeze(-1)
 
@@ -386,6 +388,7 @@ class DirecT2VPipeline(StableDiffusionPipeline):
         requires_safety_checker: bool = True,
         all_attn: bool = False,
         rot_attn: bool = True,
+        dual_filter: float = 0.0,
     ):
         super().__init__(
             vae, text_encoder, tokenizer, unet, scheduler, safety_checker, feature_extractor, requires_safety_checker
@@ -396,17 +399,17 @@ class DirecT2VPipeline(StableDiffusionPipeline):
                 if proc_key.startswith('up_blocks.2') or proc_key.startswith('up_blocks.3'):
                     self.timestep_counter = []
                     attn_processors[proc_key] = (
-                        CrossFrameAttnProcessor2_0(self, batch_size=2, rot_attn=rot_attn)
+                        CrossFrameAttnProcessor2_0(self, batch_size=2, rot_attn=rot_attn, dual_filter=dual_filter)
                         if hasattr(F, "scaled_dot_product_attention")
-                        else CrossFrameAttnProcessor(self, batch_size=2, rot_attn=rot_attn)
+                        else CrossFrameAttnProcessor(self, batch_size=2, rot_attn=rot_attn, dual_filter=dual_filter)
                     )
             self.unet.set_attn_processor(attn_processors)
         else:
             self.timestep_counter = []
             self.unet.set_attn_processor(
-                CrossFrameAttnProcessor2_0(self, batch_size=2, rot_attn=rot_attn)
+                CrossFrameAttnProcessor2_0(self, batch_size=2, rot_attn=rot_attn, dual_filter=dual_filter)
                 if hasattr(F, "scaled_dot_product_attention")
-                else CrossFrameAttnProcessor(self, batch_size=2, rot_attn=rot_attn)
+                else CrossFrameAttnProcessor(self, batch_size=2, rot_attn=rot_attn, dual_filter=dual_filter)
             )
 
     def forward_loop(self, x_t0, t0, t1, generator):
