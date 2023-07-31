@@ -15,7 +15,10 @@ https://github.com/KU-CVLAB/DirecT2V/assets/5498512/b721aa65-8156-4fdc-a371-db6e
 
 ## 🗃️: Code
 
-The running code can be found in `run_direct2v.py`. We utilized PyTorch 1.13.0 and Diffusers 1.19.3 in our environment. Due to our budget constraints, we opted for pre-calculated prompts instead of using the GPT-4 API.
+The running code can be found in `run_direct2v.py`. We used PyTorch 1.13.0 and Diffusers 1.19.3.
+```
+python run_direct2v.py
+```
 
 ## 🔥 TODOs
 - [X] Upload code
